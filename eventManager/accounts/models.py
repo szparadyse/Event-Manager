@@ -21,7 +21,7 @@ class Events(models.Model):
     
 
 class EventReviews(models.Model):
-    event = models.ForeignKey(Events, on_delete=models.CASCADE)
+    event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='reviews')
     review_text = models.TextField()
     rating = models.IntegerField()
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)

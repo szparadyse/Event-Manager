@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Événements</title>
+</head>
+<body>
+    <h1>Liste des événements</h1>
+    <a href="{% url 'accounts:add_event' %}">Créer un événement</a>
+    <ul>
+      {% for event in events %}
+        <li>
+          <a href="{% url 'accounts:event_details' event.id %}">{{ event.title }}</a>
+          ({{ event.date }})
+        </li>
+      {% endfor %}
+    </ul>
+</body>
+</html>
