@@ -1,0 +1,89 @@
+{% extends "events/base_dashboard.html" %}
+
+{% block title %}Administrateur{% endblock %}
+{% block header_title %}Tableau de bord administrateur{% endblock %}
+
+{% block content %}
+<section class="grid grid-3">
+    <article class="card">
+        <h2>Utilisateurs</h2>
+        <p style="font-size:2.4rem; font-weight:700;">{{ totals.users }}</p>
+        <p class="muted">Utilisateurs actifs</p>
+    </article>
+    <article class="card">
+        <h2>Événements</h2>
+        <p style="font-size:2.4rem; font-weight:700;">{{ totals.events }}</p>
+        <p class="muted">Événements publiés & archivés</p>
+    </article>
+    <article class="card">
+        <h2>Engagement</h2>
+        <p style="font-size:2.4rem; font-weight:700;">{{ totals.registrations }}</p>
+        <p class="muted">Inscriptions enregistrées</p>
+    </article>
+</section>
+
+<section class="grid" style="margin-top:2rem; gap:2rem;">
+    <article class="card">
+        <h2>Avis</h2>
+        <p style="font-size:2.4rem; font-weight:700;">{{ totals.reviews }}</p>
+        <p class="muted">Avis déposés sur la plateforme</p>
+    </article>
+    <article class="card">
+        <h2>Répartition par catégorie</h2>
+        {% if category_distribution %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Événements</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in category_distribution %}
+                <tr>
+                    <td>{{ item.category_name }}</td>
+                    <td>{{ item.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="muted">Aucune donnée pour le moment.</p>
+        {% endif %}
+    </article>
+</section>
+
+<section class="card" style="margin-top:2rem;">
+    <h2>Top événements</h2>
+    {% if top_events %}
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th>Organisateur</th>
+                    <th>Catégorie</th>
+                    <th>Note moyenne</th>
+                    <th>Avis</th>
+                    <th>Inscrits</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in top_events %}
+                <tr>
+                    <td>{{ event.title }}</td>
+                    <td>{{ event.organizer.get_full_name|default:event.organizer.username }}</td>
+                    <td>{{ event.category.name|default:"Sans catégorie" }}</td>
+                    <td>{{ event.average_rating|default:"-"|floatformat:1 }}/5</td>
+                    <td>{{ event.reviews_count }}</td>
+                    <td>{{ event.registrations_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="muted">Les événements n'ont pas encore reçu d'avis.</p>
+    {% endif %}
+</section>
+{% endblock %}

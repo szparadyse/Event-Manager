@@ -1,0 +1,71 @@
+{% extends "events/base_dashboard.html" %}
+
+{% block title %}Organisateur{% endblock %}
+{% block header_title %}Tableau de bord organisateur{% endblock %}
+
+{% block content %}
+<section class="grid grid-3">
+    <article class="card">
+        <h2>Inscrits</h2>
+        <p class="muted">Total d'inscriptions confirmées</p>
+        <p style="font-size:2.4rem; font-weight:700;">{{ total_registrations }}</p>
+    </article>
+    <article class="card">
+        <h2>Taux de participation</h2>
+        <p class="muted">Participants présents / inscrits</p>
+        <p style="font-size:2.4rem; font-weight:700;">{{ participation_rate }}<span style="font-size:1.2rem;">%</span></p>
+    </article>
+    <article class="card">
+        <h2>Avis reçus</h2>
+        <p class="muted">Note moyenne et volume</p>
+        <p style="font-size:2.4rem; font-weight:700;">{{ total_reviews }}</p>
+        <p class="muted">Note moyenne : {{ average_rating|default:"-"|floatformat:1 }}/5</p>
+    </article>
+</section>
+
+<section class="card" style="margin-top:2rem;">
+    <h2>Événements</h2>
+    {% if events %}
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Événement</th>
+                    <th>Catégorie</th>
+                    <th>Période</th>
+                    <th>Statut</th>
+                    <th>Inscrits</th>
+                    <th>Présents</th>
+                    <th>Avis</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events %}
+                <tr>
+                    <td>
+                        <strong>{{ event.title }}</strong><br>
+                        <span class="muted">{{ event.location|default:"Lieu à définir" }}</span>
+                    </td>
+                    <td>{{ event.category.name|default:"Sans catégorie" }}</td>
+                    <td>
+                        {{ event.start_at|date:"d/m/Y H:i" }}<br>
+                        <span class="muted">→ {{ event.end_at|date:"d/m/Y H:i" }}</span>
+                    </td>
+                    <td>
+                        <span class="pill {{ event.status }}">{{ event.get_status_display }}</span>
+                    </td>
+                    <td>{{ event.registrations_count }}</td>
+                    <td>{{ event.checked_in_count }}</td>
+                    <td>{{ event.reviews_count }}</td>
+                    <td>{{ event.average_rating|default:"-"|floatformat:1 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <p class="muted">Vous n'avez encore aucun événement. Créez votre premier événement pour voir vos statistiques apparaître ici.</p>
+    {% endif %}
+</section>
+{% endblock %}

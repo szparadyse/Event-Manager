@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>{% block title %}Tableau de bord{% endblock %} · Event Manager</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f6f8; color: #1f2933; }
+        header { background: #111827; color: #f9fafb; padding: 1.2rem 2rem; }
+        main { padding: 2rem; }
+        h1 { margin: 0 0 1rem 0; font-size: 1.8rem; }
+        .grid { display: grid; gap: 1.5rem; }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .card { background: #fff; border-radius: 8px; padding: 1.5rem; box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08); }
+        .card h2 { margin-top: 0; font-size: 1.1rem; color: #111827; text-transform: uppercase; letter-spacing: 0.08em; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 0.75rem; border-bottom: 1px solid #e5e7eb; text-align: left; }
+        th { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: #4b5563; }
+        tr:hover { background: #f9fafb; }
+        .pill { display: inline-flex; align-items: center; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; }
+        .pill.published { background: rgba(16, 185, 129, 0.15); color: #047857; }
+        .pill.draft { background: rgba(59, 130, 246, 0.15); color: #1d4ed8; }
+        .pill.closed { background: rgba(249, 115, 22, 0.15); color: #c2410c; }
+        .pill.archived { background: rgba(107, 114, 128, 0.15); color: #374151; }
+        .muted { color: #6b7280; }
+        footer { padding: 2rem; text-align: center; color: #6b7280; font-size: 0.9rem; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+<header>
+    <h1>{% block header_title %}Tableau de bord{% endblock %}</h1>
+</header>
+<main>
+    {% block content %}{% endblock %}
+</main>
+<footer>
+    Propulsé par Event Manager · {% now "d/m/Y H:i" %}
+</footer>
+</body>
+</html>
