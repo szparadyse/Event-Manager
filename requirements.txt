@@ -1,0 +1,8 @@
+Django==5.2.6
+Pillow>=10.0.0
+# Tailwind pour Django
+django-tailwind>=3.8
+# Classification d'images utilisée pour générer des tags
+# Selon la plateforme, choisissez le bon build de torch/torchvision
+torch
+torchvision
