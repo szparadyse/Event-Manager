@@ -78,35 +78,7 @@ def populate_test_data():
         defaults={'answer_text': 'Merci pour votre participation !'},
     )
 
-    # Images liées aux événements et aux avis
-    img1, _ = Image.objects.get_or_create(
-        event=event1,
-        review=None,
-        imagePath='images/djangocon.jpg',
-    )
-    img1.tags.add(tag_tech, tag_python)
-
-    img2, _ = Image.objects.get_or_create(
-        event=event2,
-        review=None,
-        imagePath='images/atelier-python.jpg',
-    )
-    img2.tags.add(tag_python, tag_network)
-
-    # Images associées aux avis
-    img_review1, _ = Image.objects.get_or_create(
-        event=event1,
-        review=review1,
-        imagePath='images/review-djangocon.jpg',
-    )
-    img_review1.tags.add(tag_ai)
-
-    img_review2, _ = Image.objects.get_or_create(
-        event=event2,
-        review=review2,
-        imagePath='images/review-atelier.jpg',
-    )
-    img_review2.tags.add(tag_network)
+   
 
     print("Données de test insérées avec succès.")
 
