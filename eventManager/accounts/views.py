@@ -219,3 +219,14 @@ def delete_answer(request, answer_id):
 def category_list(request):
     categories = Categories.objects.all()
     return render(request, 'category_list.html', {'categories': categories})
+
+
+class ProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'profile.html'
+    login_url = reverse_lazy('accounts:login')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # L'utilisateur connecté est disponible via request.user dans le template,
+        # mais on peut ajouter des infos complémentaires si besoin.
+        return context

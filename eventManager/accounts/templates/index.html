@@ -212,11 +212,12 @@
             </div>
           </div>
           <div class="mt-4">
-            <button
-              class="w-full rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-200"
+            <a
+              href="{% url 'accounts:profile' %}"
+              class="block text-center rounded-lg bg-purple-600 px-4 py-2 text-sm font-medium text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors duration-200"
             >
               Modifier le profil
-            </button>
+            </a>
           </div>
         </div>
       </div>
@@ -231,10 +232,23 @@
           <h2 class="text-lg font-semibold text-gray-900">Activité récente</h2>
         </div>
         <div class="p-6">
+          <div class="mb-4 flex items-center gap-3">
+            <label for="categoryFilter" class="text-sm font-medium text-gray-700">Filtrer par catégorie</label>
+            <select
+              id="categoryFilter"
+              class="mt-1 block w-60 rounded-md border-gray-300 shadow-sm"
+              onchange="filterRecentByCategory()"
+            >
+              <option value="">Toutes les catégories</option>
+              {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
           {% if events %}
-          <ul role="list" class="divide-y divide-gray-200">
+          <ul id="recentList" role="list" class="divide-y divide-gray-200">
             {% for event in events %}
-            <li class="py-3 flex items-center justify-between">
+            <li class="py-3 flex items-center justify-between" data-category-id="{{ event.category.id }}">
               <div class="min-w-0">
                 <p class="text-sm font-medium text-gray-900">{{ event.title }}</p>
                 <p class="text-sm text-gray-500">
@@ -250,6 +264,27 @@
             </li>
             {% endfor %}
           </ul>
+          <div id="recentFilterEmpty" class="text-center py-8" style="display:none;">
+            <svg
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              ></path>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">
+              Aucun événement pour cette catégorie
+            </h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Modifiez le filtre pour afficher d'autres résultats.
+            </p>
+          </div>
           {% else %}
           <div class="text-center py-8">
             <svg
@@ -418,6 +453,23 @@
   }
   function closeModal() {
     document.getElementById("eventModal").close();
+  }
+  function filterRecentByCategory() {
+    const select = document.getElementById("categoryFilter");
+    const selected = select ? select.value : "";
+    const list = document.getElementById("recentList");
+    if (!list) return;
+    const items = list.querySelectorAll("li[data-category-id]");
+    let visibleCount = 0;
+    items.forEach((li) => {
+      const match = !selected || li.getAttribute("data-category-id") === selected;
+      li.style.display = match ? "" : "none";
+      if (match) visibleCount++;
+    });
+    const emptyMsg = document.getElementById("recentFilterEmpty");
+    if (emptyMsg) {
+      emptyMsg.style.display = visibleCount === 0 ? "block" : "none";
+    }
   }
 </script>
 

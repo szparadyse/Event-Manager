@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
-from .views import SignUpView, event_list, event_details, add_event, add_review, add_answer
+from .views import SignUpView, event_list, event_details, add_event, add_review, add_answer, ProfileView
 
 app_name = 'accounts'
 
@@ -13,4 +13,5 @@ urlpatterns = [
   path('events/<int:event_id>/', event_details, name='event_details'),
   path('events/<int:event_id>/add_review/', add_review, name='add_review'),
   path('reviews/<int:review_id>/add_answer/', add_answer, name='add_answer'),
+  path('profile/', ProfileView.as_view(), name='profile'),
 ]
