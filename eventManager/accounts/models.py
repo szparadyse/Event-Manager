@@ -19,6 +19,14 @@ class Events(models.Model):
     def __str__(self):
         return f'{self.title} - {self.category.name}'
     
+class Image(models.Model):
+    event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='images')
+    review = models.ForeignKey('EventReviews', on_delete=models.CASCADE, related_name='images', null=True, blank=True)
+    imagePath = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'Image for {self.event.title}'
+    
 
 class EventReviews(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='reviews')

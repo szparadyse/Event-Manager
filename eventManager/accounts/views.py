@@ -3,7 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
-from .models import Answers, Categories, EventReviews, Events
+from .models import Answers, Categories, EventReviews, Events, Image
 
 class SignUpView(CreateView):
     form_class = UserCreationForm
@@ -14,6 +14,12 @@ class SignUpView(CreateView):
 class HomeView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
     login_url = reverse_lazy('accounts:login')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['events'] = Events.objects.order_by('date')[:5]  # Les 5 prochains événements
+        context['categories'] = Categories.objects.all()
+        return context
 
 
 def event_reviews(request, event_id):
@@ -37,7 +43,7 @@ def add_event(request):
         date = request.POST.get('date')
         location = request.POST.get('location')
         places = request.POST.get('places')
-        Events.objects.create(
+        event = Events.objects.create(
             title=title,
             category_id=category_id,
             date=date,
@@ -45,7 +51,8 @@ def add_event(request):
             places=places,
             created_by=request.user
         )
-        return redirect('accounts:event_list')
+        add_image(request, event_id=event.id)
+        return redirect('home')
     return render(request, 'add_event.html', {'categories': categories})
 
 def add_answer(request, review_id):
@@ -73,6 +80,25 @@ def add_review(request, event_id):
         )
         return redirect('accounts:event_details', event_id=event_id)
     return render(request, 'add_review.html')
+
+def add_image(request, event_id=None, review_id=None):
+    if request.method == 'POST':
+        imagePath = request.POST.get('imagePath')
+        if event_id:
+            event = Events.objects.get(id=event_id)
+            Image.objects.create(
+                event=event,
+                imagePath=imagePath
+            )
+            return redirect('accounts:event_details', event_id=event_id)
+        elif review_id:
+            review = EventReviews.objects.get(id=review_id)
+            Image.objects.create(
+                review=review,
+                imagePath=imagePath
+            )
+            return redirect('accounts:event_details', event_id=review.event.id)
+    return render(request, 'add_image.html', {'event_id': event_id, 'review_id': review_id})
 
 def category_list(request):
     categories = Categories.objects.all()

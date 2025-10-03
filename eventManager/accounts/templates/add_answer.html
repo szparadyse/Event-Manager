@@ -1,18 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ajouter une Réponse</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Ajouter une Réponse</h1>
     <form method="post">
-        {% csrf_token %}
-        <label for="answer_text">Votre réponse :</label>
-        <textarea id="answer_text" name="answer_text" rows="3" required></textarea><br>
-    <input type="submit" value="Soumettre la Réponse">
-    <button type="button" onclick="window.history.back()">Retour</button>
+      {% csrf_token %}
+      <label for="answer_text">Votre réponse :</label>
+      <textarea id="answer_text" name="answer_text" rows="3" required></textarea
+      ><br />
+      <input type="submit" value="Soumettre la Réponse" />
+      <button type="button" onclick="window.history.back()">Retour</button>
     </form>
-</body>
+  </body>
 </html>
