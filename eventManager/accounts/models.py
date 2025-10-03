@@ -28,7 +28,7 @@ class Events(models.Model):
 class Image(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='images')
     review = models.ForeignKey('EventReviews', on_delete=models.CASCADE, related_name='images', null=True, blank=True)
-    imagePath = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='events/', null=True, blank=True)
     tags = models.ManyToManyField(Tags, related_name='images', blank=True)
 
     def __str__(self):

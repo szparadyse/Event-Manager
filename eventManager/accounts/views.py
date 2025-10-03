@@ -3,7 +3,18 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
-from .models import Answers, Categories, EventReviews, Events, Image
+from .models import Answers, Categories, EventReviews, Events, Image, Tags
+import os
+import torch
+from torchvision import models
+from PIL import Image as PILImage
+from django.conf import settings
+
+weights = models.EfficientNet_B3_Weights.IMAGENET1K_V1
+model = models.efficientnet_b3(weights=weights)
+model.eval()
+labels = weights.meta["categories"]
+transform = weights.transforms()
 
 class SignUpView(CreateView):
     form_class = UserCreationForm
@@ -43,6 +54,7 @@ def add_event(request):
         date = request.POST.get('date')
         location = request.POST.get('location')
         places = request.POST.get('places')
+        uploaded_file = request.FILES.get('image')
         event = Events.objects.create(
             title=title,
             category_id=category_id,
@@ -51,7 +63,21 @@ def add_event(request):
             places=places,
             created_by=request.user
         )
-        add_image(request, event_id=event.id)
+        if uploaded_file:
+            image_obj = Image.objects.create(event=event, image=uploaded_file)
+
+            img_path = os.path.join(settings.MEDIA_ROOT, str(image_obj.image))
+            pil_img = PILImage.open(img_path).convert("RGB")
+            input_tensor = transform(pil_img).unsqueeze(0)
+
+            with torch.no_grad():
+                outputs = model(input_tensor)
+                _, indices = outputs.topk(5)
+                predicted_tags = [labels[idx] for idx in indices[0]]
+
+            for tag_name in predicted_tags:
+                tag, _ = Tags.objects.get_or_create(name=tag_name)
+                image_obj.tags.add(tag)
         return redirect('home')
     return render(request, 'add_event.html', {'categories': categories})
 
@@ -83,24 +109,34 @@ def add_review(request, event_id):
 
 def add_image(request, event_id=None, review_id=None):
     if request.method == 'POST':
-        imagePath = request.POST.get('imagePath')
-        tags = request.POST.getlist('tags')
+        uploaded_file = request.FILES.get('image') 
+        if not uploaded_file:
+            return render(request, 'add_image.html', {'event_id': event_id, 'review_id': review_id, 'error': 'Aucune image envoyée'})
+
         if event_id:
             event = Events.objects.get(id=event_id)
-            image = Image.objects.create(
-                event=event,
-                imagePath=imagePath
-            )
-            image.tags.set(tags)
-            return redirect('accounts:event_details', event_id=event_id)
+            image_obj = Image.objects.create(event=event, image=uploaded_file)
         elif review_id:
             review = EventReviews.objects.get(id=review_id)
-            image = Image.objects.create(
-                review=review,
-                imagePath=imagePath
-            )
-            image.tags.set(tags)
-            return redirect('accounts:event_details', event_id=review.event.id)
+            image_obj = Image.objects.create(review=review, image=uploaded_file)
+
+        
+        img_path = os.path.join(settings.MEDIA_ROOT, str(image_obj.image))
+        pil_img = PILImage.open(img_path).convert("RGB")
+        input_tensor = transform(pil_img).unsqueeze(0)
+
+        with torch.no_grad():
+            outputs = model(input_tensor)
+            _, indices = outputs.topk(5)
+            predicted_tags = [labels[idx] for idx in indices[0]]
+
+       
+        for tag_name in predicted_tags:
+            tag, _ = Tags.objects.get_or_create(name=tag_name)
+            image_obj.tags.add(tag)
+
+        return redirect('accounts:event_details', event_id=image_obj.event.id if event_id else review.event.id)
+
     return render(request, 'add_image.html', {'event_id': event_id, 'review_id': review_id})
 
 def update_event(request, event_id):
