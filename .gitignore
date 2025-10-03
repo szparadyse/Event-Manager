@@ -1,53 +1,90 @@
-# Python
+# --- Python ---
 __pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.pyc
+*$py.class
+*.so
 
-# Django
+# Packaging / build
+build/
+dist/
+.eggs/
+*.egg-info/
+*.egg
+pip-wheel-metadata/
+
+# Logs
 *.log
-*.pot
-*.pyc
-db.sqlite3
-media/
-staticfiles/
+
+# Tests / coverage
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+htmlcov/
+.hypothesis/
+
+# Type checkers / linters
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+
+# --- Django ---
 local_settings.py
 
-# VS Code
-.vscode/
+# Bases SQLite
+/db.sqlite3
+**/db.sqlite3
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
 
-# Environments
+# Fichiers collectstatic (générés)
+/staticfiles/
+**/staticfiles/
+
+# Uploads utilisateur
+/media/
+**/media/
+
+# --- Environnements ---
 .env
+.env.*
 .venv/
-env/
 venv/
 ENV/
-env.bak/
-venv.bak/
+env/
+.python-version
 
-# OS
+# Projet: venv dans Event-Manager
+Event-Manager/venv/
+
+# --- Node / Front assets ---
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+pnpm-debug.log*
+.cache/
+.parcel-cache/
+
+# Django Tailwind (assets sources et build)
+Event-Manager/eventManager/theme/static_src/node_modules/
+Event-Manager/eventManager/theme/static/
+
+# --- IDE / éditeurs ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- OS / divers ---
 .DS_Store
 Thumbs.db
 
-# Migrations
-*/migrations/*.pyc
-*/migrations/__pycache__/
-*/migrations/*.py
+# --- Autres courants ---
+*.pid
+celerybeat-schedule
 
-# Coverage reports
-htmlcov/
-.coverage
-.tox/
-.nox/
-.cache/
-.pytest_cache/
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
 
-# MyPy
-.mypy_cache/
-.dmypy.json
-.pyre/
