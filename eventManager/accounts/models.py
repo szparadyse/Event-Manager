@@ -7,6 +7,12 @@ class Categories(models.Model):
 
     def __str__(self):
         return f'{self.name}'
+    
+class Tags(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'{self.name}'
 
 class Events(models.Model):
     title = models.CharField(max_length=100)
@@ -23,6 +29,7 @@ class Image(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE, related_name='images')
     review = models.ForeignKey('EventReviews', on_delete=models.CASCADE, related_name='images', null=True, blank=True)
     imagePath = models.CharField(max_length=200)
+    tags = models.ManyToManyField(Tags, related_name='images', blank=True)
 
     def __str__(self):
         return f'Image for {self.event.title}'

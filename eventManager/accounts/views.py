@@ -84,19 +84,22 @@ def add_review(request, event_id):
 def add_image(request, event_id=None, review_id=None):
     if request.method == 'POST':
         imagePath = request.POST.get('imagePath')
+        tags = request.POST.getlist('tags')
         if event_id:
             event = Events.objects.get(id=event_id)
-            Image.objects.create(
+            image = Image.objects.create(
                 event=event,
                 imagePath=imagePath
             )
+            image.tags.set(tags)
             return redirect('accounts:event_details', event_id=event_id)
         elif review_id:
             review = EventReviews.objects.get(id=review_id)
-            Image.objects.create(
+            image = Image.objects.create(
                 review=review,
                 imagePath=imagePath
             )
+            image.tags.set(tags)
             return redirect('accounts:event_details', event_id=review.event.id)
     return render(request, 'add_image.html', {'event_id': event_id, 'review_id': review_id})
 
@@ -148,7 +151,6 @@ def delete_review(request, review_id):
 def delete_answer(request, answer_id):
     answer = Answers.objects.get(id=answer_id)
     if request.method == 'POST':
-        review_id = answer.review.id
         answer.delete()
         return redirect('home', event_id=answer.review.event.id)
     return render(request, 'delete_answer.html', {'answer': answer})
