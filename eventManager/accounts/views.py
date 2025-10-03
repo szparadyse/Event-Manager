@@ -5,16 +5,39 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from .models import Answers, Categories, EventReviews, Events, Image, Tags
 import os
-import torch
-from torchvision import models
 from PIL import Image as PILImage
 from django.conf import settings
 
-weights = models.EfficientNet_B3_Weights.IMAGENET1K_V1
-model = models.efficientnet_b3(weights=weights)
-model.eval()
-labels = weights.meta["categories"]
-transform = weights.transforms()
+# Chargement paresseux et tolérant du modèle (évite les téléchargements au démarrage)
+_ML_READY = False
+_tv_models = None
+_torch = None
+_model = None
+_labels = None
+_transform = None
+
+def _ensure_model_loaded():
+    global _ML_READY, _tv_models, _torch, _model, _labels, _transform
+    if _ML_READY:
+        return True
+    try:
+        import torch as _t
+        from torchvision import models as _m
+        weights = _m.EfficientNet_B3_Weights.IMAGENET1K_V1
+        model = _m.efficientnet_b3(weights=weights)
+        model.eval()
+        labels = weights.meta["categories"]
+        transform = weights.transforms()
+        _torch = _t
+        _tv_models = _m
+        _model = model
+        _labels = labels
+        _transform = transform
+        _ML_READY = True
+        return True
+    except Exception:
+        _ML_READY = False
+        return False
 
 class SignUpView(CreateView):
     form_class = UserCreationForm
@@ -65,19 +88,20 @@ def add_event(request):
         )
         if uploaded_file:
             image_obj = Image.objects.create(event=event, image=uploaded_file)
-
-            img_path = os.path.join(settings.MEDIA_ROOT, str(image_obj.image))
-            pil_img = PILImage.open(img_path).convert("RGB")
-            input_tensor = transform(pil_img).unsqueeze(0)
-
-            with torch.no_grad():
-                outputs = model(input_tensor)
-                _, indices = outputs.topk(5)
-                predicted_tags = [labels[idx] for idx in indices[0]]
-
-            for tag_name in predicted_tags:
-                tag, _ = Tags.objects.get_or_create(name=tag_name)
-                image_obj.tags.add(tag)
+            if _ensure_model_loaded():
+                try:
+                    img_path = os.path.join(settings.MEDIA_ROOT, str(image_obj.image))
+                    pil_img = PILImage.open(img_path).convert("RGB")
+                    input_tensor = _transform(pil_img).unsqueeze(0)
+                    with _torch.no_grad():
+                        outputs = _model(input_tensor)
+                        _, indices = outputs.topk(5)
+                        predicted_tags = [_labels[idx] for idx in indices[0]]
+                    for tag_name in predicted_tags:
+                        tag, _ = Tags.objects.get_or_create(name=tag_name)
+                        image_obj.tags.add(tag)
+                except Exception:
+                    pass
         return redirect('home')
     return render(request, 'add_event.html', {'categories': categories})
 
@@ -121,19 +145,20 @@ def add_image(request, event_id=None, review_id=None):
             image_obj = Image.objects.create(review=review, image=uploaded_file)
 
         
-        img_path = os.path.join(settings.MEDIA_ROOT, str(image_obj.image))
-        pil_img = PILImage.open(img_path).convert("RGB")
-        input_tensor = transform(pil_img).unsqueeze(0)
-
-        with torch.no_grad():
-            outputs = model(input_tensor)
-            _, indices = outputs.topk(5)
-            predicted_tags = [labels[idx] for idx in indices[0]]
-
-       
-        for tag_name in predicted_tags:
-            tag, _ = Tags.objects.get_or_create(name=tag_name)
-            image_obj.tags.add(tag)
+        if _ensure_model_loaded():
+            try:
+                img_path = os.path.join(settings.MEDIA_ROOT, str(image_obj.image))
+                pil_img = PILImage.open(img_path).convert("RGB")
+                input_tensor = _transform(pil_img).unsqueeze(0)
+                with _torch.no_grad():
+                    outputs = _model(input_tensor)
+                    _, indices = outputs.topk(5)
+                    predicted_tags = [_labels[idx] for idx in indices[0]]
+                for tag_name in predicted_tags:
+                    tag, _ = Tags.objects.get_or_create(name=tag_name)
+                    image_obj.tags.add(tag)
+            except Exception:
+                pass
 
         return redirect('accounts:event_details', event_id=image_obj.event.id if event_id else review.event.id)
 
