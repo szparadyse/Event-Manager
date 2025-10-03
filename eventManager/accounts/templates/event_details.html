@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Détails de l'Événement</title>
+  </head>
+  <body>
+    <button type="button" onclick="window.history.back()">Retour</button>
+    <h1>{{ event.title }}</h1>
+    <p>Catégorie: {{ event.category.name }}</p>
+    <p>Date: {{ event.date }}</p>
+    <p>Lieu: {{ event.location }}</p>
+    <p>Places disponibles: {{ event.places }}</p>
+    <h2>Avis</h2>
+    <a href="{% url 'accounts:add_review' event.id %}">Laisser un avis</a>
+    <ul>
+      {% for review in event.reviews.all %}
+      <li>
+        <strong>{{ review.created_by.username }}:</strong> {{ review.review_text
+        }} ({{ review.rating }} étoiles)
+        <a href="{% url 'accounts:add_answer' review.id %}">Répondre</a>
+        <ul>
+          {% for answer in review.answers_set.all %}
+          <li>
+            <strong>{{ answer.created_by.username }} :</strong> {{
+            answer.answer_text }}
+          </li>
+          {% empty %}
+          <li>Aucune réponse.</li>
+          {% endfor %}
+        </ul>
+      </li>
+      {% empty %}
+      <li>Aucun avis disponible.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>
