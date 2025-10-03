@@ -231,6 +231,26 @@
           <h2 class="text-lg font-semibold text-gray-900">Activité récente</h2>
         </div>
         <div class="p-6">
+          {% if events %}
+          <ul role="list" class="divide-y divide-gray-200">
+            {% for event in events %}
+            <li class="py-3 flex items-center justify-between">
+              <div class="min-w-0">
+                <p class="text-sm font-medium text-gray-900">{{ event.title }}</p>
+                <p class="text-sm text-gray-500">
+                  {{ event.date|date:"d/m/Y H:i" }} • {{ event.location }} • {{ event.category.name }}
+                </p>
+              </div>
+              <a
+                href="{% url 'accounts:event_details' event.id %}"
+                class="inline-flex items-center rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              >
+                Détail
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
           <div class="text-center py-8">
             <svg
               class="mx-auto h-12 w-12 text-gray-400"
@@ -252,6 +272,7 @@
               Commencez par créer votre premier événement.
             </p>
           </div>
+          {% endif %}
         </div>
       </div>
     </div>

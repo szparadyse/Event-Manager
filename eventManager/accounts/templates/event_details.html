@@ -1,39 +1,108 @@
-<!doctype html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Détails de l'Événement</title>
-  </head>
-  <body>
-    <button type="button" onclick="window.history.back()">Retour</button>
-    <h1>{{ event.title }}</h1>
-    <p>Catégorie: {{ event.category.name }}</p>
-    <p>Date: {{ event.date }}</p>
-    <p>Lieu: {{ event.location }}</p>
-    <p>Places disponibles: {{ event.places }}</p>
-    <h2>Avis</h2>
-    <a href="{% url 'accounts:add_review' event.id %}">Laisser un avis</a>
-    <ul>
-      {% for review in event.reviews.all %}
-      <li>
-        <strong>{{ review.created_by.username }}:</strong> {{ review.review_text
-        }} ({{ review.rating }} étoiles)
-        <a href="{% url 'accounts:add_answer' review.id %}">Répondre</a>
-        <ul>
-          {% for answer in review.answers_set.all %}
-          <li>
-            <strong>{{ answer.created_by.username }} :</strong> {{
-            answer.answer_text }}
+{% extends 'base.html' %}
+{% block title %}Détails de l'Événement - Event Manager{% endblock %}
+{% block content %}
+<div class="min-h-full">
+  <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="mb-6">
+      <button
+        type="button"
+        onclick="window.history.back()"
+        class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        ← Retour
+      </button>
+    </div>
+
+    <!-- En-tête événement -->
+    <div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5">
+      <div class="p-6">
+        <div class="flex items-start justify-between">
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">{{ event.title }}</h1>
+            <p class="mt-1 text-sm text-gray-500">Catégorie · {{ event.category.name }}</p>
+          </div>
+          <a
+            href="{% url 'accounts:add_review' event.id %}"
+            class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+          >
+            Laisser un avis
+          </a>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="rounded-xl bg-gray-50 p-4">
+            <p class="text-xs font-medium text-gray-500">Date</p>
+            <p class="mt-1 text-sm font-semibold text-gray-900">{{ event.date|date:"d/m/Y H:i" }}</p>
+          </div>
+          <div class="rounded-xl bg-gray-50 p-4">
+            <p class="text-xs font-medium text-gray-500">Lieu</p>
+            <p class="mt-1 text-sm font-semibold text-gray-900">{{ event.location }}</p>
+          </div>
+          <div class="rounded-xl bg-gray-50 p-4">
+            <p class="text-xs font-medium text-gray-500">Places disponibles</p>
+            <p class="mt-1 text-sm font-semibold text-gray-900">{{ event.places }}</p>
+          </div>
+          <div class="rounded-xl bg-gray-50 p-4">
+            <p class="text-xs font-medium text-gray-500">Catégorie</p>
+            <p class="mt-1 text-sm font-semibold text-gray-900">{{ event.category.name }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avis -->
+    <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-900/5">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Avis</h2>
+      </div>
+      <div class="p-6">
+        {% if event.reviews.all %}
+        <ul role="list" class="space-y-4">
+          {% for review in event.reviews.all %}
+          <li class="rounded-xl border border-gray-200 bg-white p-4">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-sm font-semibold text-gray-900">
+                  {{ review.created_by.username }}
+                  <span class="ml-2 text-xs font-normal text-gray-500">({{ review.rating }} étoiles)</span>
+                </p>
+                <p class="mt-1 text-sm text-gray-700">{{ review.review_text }}</p>
+              </div>
+              <a
+                href="{% url 'accounts:add_answer' review.id %}"
+                class="inline-flex items-center rounded-md bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 ring-1 ring-inset ring-blue-200 hover:bg-blue-100"
+              >
+                Répondre
+              </a>
+            </div>
+
+            <div class="mt-4">
+              <p class="text-xs font-medium text-gray-500 mb-2">Réponses</p>
+              <ul class="space-y-2">
+                {% for answer in review.answers_set.all %}
+                <li class="rounded-lg bg-gray-50 p-3">
+                  <p class="text-sm text-gray-700">
+                    <span class="font-semibold text-gray-900">{{ answer.created_by.username }} :</span>
+                    {{ answer.answer_text }}
+                  </p>
+                </li>
+                {% empty %}
+                <li class="rounded-lg bg-gray-50 p-3 text-sm text-gray-500">Aucune réponse.</li>
+                {% endfor %}
+              </ul>
+            </div>
           </li>
           {% empty %}
-          <li>Aucune réponse.</li>
+          <li class="text-sm text-gray-500">Aucun avis disponible.</li>
           {% endfor %}
         </ul>
-      </li>
-      {% empty %}
-      <li>Aucun avis disponible.</li>
-      {% endfor %}
-    </ul>
-  </body>
-</html>
+        {% else %}
+        <div class="text-center py-8">
+          <p class="text-sm text-gray-500">Aucun avis disponible.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
