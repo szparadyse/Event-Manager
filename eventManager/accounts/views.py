@@ -100,6 +100,59 @@ def add_image(request, event_id=None, review_id=None):
             return redirect('accounts:event_details', event_id=review.event.id)
     return render(request, 'add_image.html', {'event_id': event_id, 'review_id': review_id})
 
+def update_event(request, event_id):
+    event = Events.objects.get(id=event_id)
+    categories = Categories.objects.all()
+    if request.method == 'POST':
+        event.title = request.POST.get('title')
+        event.category_id = request.POST.get('category')
+        event.date = request.POST.get('date')
+        event.location = request.POST.get('location')
+        event.places = request.POST.get('places')
+        event.save()
+        return redirect('home')
+    return render(request, 'update_event.html', {'event': event, 'categories': categories})
+
+def update_review(request, review_id):
+    review = EventReviews.objects.get(id=review_id)
+    if request.method == 'POST':
+        review.review_text = request.POST.get('review_text')
+        review.rating = request.POST.get('rating')
+        review.save()
+        return redirect('home', event_id=review.event.id)
+    return render(request, 'update_review.html', {'review': review})
+
+def update_answer(request, answer_id):
+    answer = Answers.objects.get(id=answer_id)
+    if request.method == 'POST':
+        answer.answer_text = request.POST.get('answer_text')
+        answer.save()
+        return redirect('home', event_id=answer.review.event.id)
+    return render(request, 'update_answer.html', {'answer': answer})
+
+def delete_event(request, event_id):
+    event = Events.objects.get(id=event_id)
+    if request.method == 'POST':
+        event.delete()
+        return redirect('home')
+    return render(request, 'delete_event.html', {'event': event})
+
+def delete_review(request, review_id):
+    review = EventReviews.objects.get(id=review_id)
+    if request.method == 'POST':
+        event_id = review.event.id
+        review.delete()
+        return redirect('home', event_id=event_id)
+    return render(request, 'delete_review.html', {'review': review})
+
+def delete_answer(request, answer_id):
+    answer = Answers.objects.get(id=answer_id)
+    if request.method == 'POST':
+        review_id = answer.review.id
+        answer.delete()
+        return redirect('home', event_id=answer.review.event.id)
+    return render(request, 'delete_answer.html', {'answer': answer})
+
 def category_list(request):
     categories = Categories.objects.all()
     return render(request, 'category_list.html', {'categories': categories})
