@@ -57,9 +57,6 @@ ENV/
 env/
 .python-version
 
-# Projet: venv dans Event-Manager
-Event-Manager/venv/
-
 # --- Node / Front assets ---
 node_modules/
 **/node_modules/
@@ -71,8 +68,8 @@ pnpm-debug.log*
 .parcel-cache/
 
 # Django Tailwind (assets sources et build)
-Event-Manager/eventManager/theme/static_src/node_modules/
-Event-Manager/eventManager/theme/static/
+eventManager/theme/static_src/node_modules/
+eventManager/theme/static/
 
 # --- IDE / éditeurs ---
 .vscode/
@@ -86,5 +83,3 @@ Thumbs.db
 # --- Autres courants ---
 *.pid
 celerybeat-schedule
-
-
